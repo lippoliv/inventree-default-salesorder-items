@@ -46,8 +46,17 @@ class DefaultSalesOrderItemsPlugin(InvenTreePlugin, SettingsMixin, EventMixin):
         self.log(kwargs['id'], "new sales order")
 
         order = SalesOrder.objects.filter(id=kwargs['id']).first()
-        default_part_ids = self.get_setting(
-            'DEFAULT_SO_ITEMS_CSV', cache=False).split(',')
+        default_part_ids_csv = self.get_setting(
+            'DEFAULT_SO_ITEMS_CSV', cache=False)
+
+        if not default_part_ids_csv or default_part_ids_csv == '':
+            self.log(
+                kwargs['id'],
+                "nothing to add, no default items configured"
+            )
+            return
+
+        default_part_ids = default_part_ids_csv.split(',')
 
         self.log(kwargs['id'], "add parts", default_part_ids)
         for part_id in default_part_ids:
